@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { UserView } from 'src/sections/user/view';
+import { ProductsView } from 'src/sections/products/view';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function PendingPage() {
   return (
     <>
       <Helmet>
-        <title> User | AradaX </title>
+        <title> Pending | AradaX </title>
       </Helmet>
 
-      <UserView />
+      <ProductsView />
     </>
   );
 }

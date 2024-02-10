@@ -1,41 +1,54 @@
-import SvgColor from 'src/components/svg-color';
+import DashboardIcon from '@mui/icons-material/Analytics';
+import UserIcon from '@mui/icons-material/AccountCircle';
+import CoursesIcon from '@mui/icons-material/ShoppingCart';
+import CategoriesIcon from '@mui/icons-material/Category';
+import QuizzesIcon from '@mui/icons-material/Quiz';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import PendingIcon from '@mui/icons-material/Schedule';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 // ----------------------------------------------------------------------
-
-const icon = (name) => (
-  <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
-);
 
 const navConfig = [
   {
     title: 'dashboard',
-    path: '/',
-    icon: icon('ic_analytics'),
+    path: '',
+    icon: <DashboardIcon sx={{ width: 1, height: 1 }} />,
   },
   {
     title: 'user',
-    path: '/user',
-    icon: icon('ic_user'),
+    path: 'user',
+    icon: <UserIcon sx={{ width: 1, height: 1 }} />,
   },
   {
-    title: 'product',
-    path: '/products',
-    icon: icon('ic_cart'),
+    title: 'courses',
+    path: 'course',
+    icon: <CoursesIcon sx={{ width: 1, height: 1 }} />,
   },
   {
-    title: 'blog',
-    path: '/blog',
-    icon: icon('ic_blog'),
+    title: 'categories',
+    path: 'category',
+    icon: <CategoriesIcon sx={{ width: 1, height: 1 }} />,
   },
   {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
+    title: 'quizzes',
+    path: 'quiz',
+    icon: <QuizzesIcon sx={{ width: 1, height: 1 }} />,
   },
   {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
+    title: 'feedbacks',
+    path: 'feedbacks',
+    icon: <FeedbackIcon sx={{ width: 1, height: 1 }} />,
+  },
+  {
+    title: 'pending',
+    path: 'pending',
+    icon: <PendingIcon sx={{ width: 1, height: 1 }} />,
+  },
+  {
+    title: 'notifications',
+    path: 'notifications',
+    icon: <NotificationsIcon sx={{ width: 1, height: 1 }} />,
   },
 ];
 

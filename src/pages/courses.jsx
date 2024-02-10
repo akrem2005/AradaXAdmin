@@ -1,17 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 
-import { UserView } from 'src/sections/user/view';
-
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function CoursePage() {
   return (
     <>
       <Helmet>
-        <title> User | AradaX </title>
+        <title> Course | AradaX </title>
       </Helmet>
-
-      <UserView />
     </>
   );
 }

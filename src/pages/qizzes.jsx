@@ -1,17 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 
-import { UserView } from 'src/sections/user/view';
-
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function QuizPage() {
   return (
     <>
       <Helmet>
-        <title> User | AradaX </title>
+        <title> Quiz| AradaX </title>
       </Helmet>
-
-      <UserView />
     </>
   );
 }
