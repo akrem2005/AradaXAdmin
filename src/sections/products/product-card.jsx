@@ -76,7 +76,6 @@ export default function ShopProductCard({ product }) {
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={product.colors} />
           {renderPrice}
         </Stack>
       </Stack>

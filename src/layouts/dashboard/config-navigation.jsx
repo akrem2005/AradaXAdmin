@@ -3,7 +3,6 @@ import UserIcon from '@mui/icons-material/AccountCircle';
 import CoursesIcon from '@mui/icons-material/ShoppingCart';
 import CategoriesIcon from '@mui/icons-material/Category';
 import QuizzesIcon from '@mui/icons-material/Quiz';
-import FeedbackIcon from '@mui/icons-material/Feedback';
 import PendingIcon from '@mui/icons-material/Schedule';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
@@ -34,11 +33,6 @@ const navConfig = [
     title: 'quizzes',
     path: 'quiz',
     icon: <QuizzesIcon sx={{ width: 1, height: 1 }} />,
-  },
-  {
-    title: 'feedbacks',
-    path: 'feedbacks',
-    icon: <FeedbackIcon sx={{ width: 1, height: 1 }} />,
   },
   {
     title: 'pending',
