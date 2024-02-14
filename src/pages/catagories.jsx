@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Modal,
@@ -9,41 +9,37 @@ import {
   CardMedia,
   Card,
   CardContent,
-  CardActions,
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
 
-export default function CatagoryPage() {
+const API_URL = 'https://aradax.com.et/categories/';
+
+export default function CategoryPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    _id: '65a2535df86c9f1fd435bcb6',
-    name: 'Ecommerce',
-    image: 'https://www.cloudways.com/blog/wp-content/uploads/Ecommerce-Shopping-I…',
-    __v: 0,
-    type: 'ec',
+    name: '',
+    image: '',
+    type: '',
   });
+  const [categoryData, setCategoryData] = useState([]);
 
-  const [categoryData, setCategoryData] = useState([
-    // Add more category data entries as needed
-    {
-      _id: '65a2535df86c9f1fd435bcb6',
-      name: 'Ecommerce',
-      image:
-        'https://www.cloudways.com/blog/wp-content/uploads/Ecommerce-Shopping-Infographics.png',
-      __v: 0,
-      type: 'ec',
-    },
-    {
-      _id: '65a253f5f86c9f1fd435bcb9',
-      name: 'Forex Trading',
-      image:
-        'https://xtb.scdn5.secure.raxcdn.com/kb_main_photo/0102/92/9ecbe35a-70bc-4b2e-80aa-74c65b57e09f/kb_main_photo_front/1-trading-what-is-it.png',
-      __v: 0,
-      type: 'fx',
-    },
-    // Add more category data entries as needed
-  ]);
+  useEffect(() => {
+    const authToken = localStorage.getItem('token');
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(API_URL, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setCategoryData(response.data);
+      } catch (error) {
+        console.error('Error fetching category data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const openModal = () => {
     setModalOpen(true);
@@ -53,12 +49,20 @@ export default function CatagoryPage() {
     setModalOpen(false);
   };
 
-  const handleCategorySubmit = (event) => {
-    // Handle category submission logic here
+  const handleCategorySubmit = async (event) => {
     event.preventDefault();
-    // Add your category submission logic, e.g., send data to the server
-    setCategoryData([...categoryData, formData]);
-    closeModal();
+    const authToken = localStorage.getItem('token');
+
+    try {
+      await axios.post('https://aradax.com.et/categories/new', formData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      setCategoryData((prevData) => [...prevData, formData]);
+      closeModal();
+    } catch (error) {
+      console.error('Error submitting category:', error);
+    }
   };
 
   const handleInputChange = (fieldName) => (event) => {
@@ -68,9 +72,18 @@ export default function CatagoryPage() {
     });
   };
 
-  const handleDeleteCategory = (id) => {
-    // Handle category deletion logic here
-    setCategoryData(categoryData.filter((category) => category._id !== id));
+  const handleDeleteCategory = async (id) => {
+    try {
+      await axios.delete(`https://aradax.com.et/categories/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      setCategoryData((prevData) => prevData.filter((category) => category._id !== id));
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
   };
 
   return (
@@ -79,7 +92,7 @@ export default function CatagoryPage() {
         <title>Category | AradaX</title>
       </Helmet>
 
-      <Button variant="contained" onClick={openModal}>
+      <Button variant="contained" onClick={openModal} aria-label="Add category">
         Add category
       </Button>
 
@@ -97,15 +110,6 @@ export default function CatagoryPage() {
                   Add category
                 </Typography>
                 <form onSubmit={handleCategorySubmit}>
-                  <TextField
-                    label="_id"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={formData._id}
-                    onChange={handleInputChange('_id')}
-                    disabled
-                  />
                   <TextField
                     label="Name"
                     variant="outlined"
@@ -129,9 +133,7 @@ export default function CatagoryPage() {
                     margin="normal"
                     value={formData.type}
                     onChange={handleInputChange('type')}
-                    disabled
                   />
-                  {/* You can add more fields as needed */}
                   <Button type="submit" variant="contained" color="primary" fullWidth>
                     Submit category
                   </Button>
@@ -149,29 +151,24 @@ export default function CatagoryPage() {
           </Grid>
         </Grid>
       </Modal>
+
       <br />
       <Typography variant="h5" gutterBottom>
         Category
       </Typography>
+
       <Grid container spacing={2}>
         {categoryData.map((category) => (
           <Grid item key={category._id} xs={12} sm={6} md={4} lg={3}>
-            <Card
-              sx={{
-                borderRadius: 2,
-                overflow: 'hidden',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-                transition: 'transform 0.2s',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
-              }}
-            >
+            <Card>
               <CardMedia component="img" height="140" image={category.image} alt={category.name} />
-
               <CardContent>
                 <Typography variant="h6">{category.name}</Typography>
-                <IconButton onClick={() => handleDeleteCategory(category._id)} color="secondary">
+                <IconButton
+                  onClick={() => handleDeleteCategory(category._id)}
+                  color="secondary"
+                  aria-label={`Delete category ${category.name}`}
+                >
                   <DeleteIcon />
                 </IconButton>
               </CardContent>

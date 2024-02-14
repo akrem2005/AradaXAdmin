@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Modal,
@@ -18,30 +18,35 @@ import {
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
+
+const API_URL = 'https://aradax.com.et/quiz/questions/';
 
 export default function QuizPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    _id: '65b52eec9cb251b98c37f2a3',
-    questionText: 'What is the Capital of Germany',
-    options: ['Berlin', 'Paris', 'Madrid', 'Rome'],
-    correctAnswer: 'Berlin',
-    category: 'ec',
-    __v: 0,
+    questionText: '',
+    options: [],
+    correctAnswer: '',
+    catagory: '',
   });
+  const [quizData, setQuizData] = useState([]);
 
-  const [quizData, setQuizData] = useState([
-    // Add more quiz data entries as needed
-    {
-      _id: '65b52eec9cb251b98c37f2a3',
-      questionText: 'What is the Capital of Germany',
-      options: ['Berlin', 'Paris', 'Madrid', 'Rome'],
-      correctAnswer: 'Berlin',
-      category: 'ec',
-      __v: 0,
-    },
-    // Add more quiz data entries as needed
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const authToken = localStorage.getItem('token');
+      try {
+        const response = await axios.get(API_URL, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setQuizData(response.data);
+      } catch (error) {
+        console.error('Error fetching quiz data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const openModal = () => {
     setModalOpen(true);
@@ -51,12 +56,24 @@ export default function QuizPage() {
     setModalOpen(false);
   };
 
-  const handleQuizSubmit = (event) => {
-    // Handle quiz submission logic here
+  const handleQuizSubmit = async (event) => {
     event.preventDefault();
-    // Add your quiz submission logic, e.g., send data to the server
-    setQuizData([...quizData, formData]);
-    closeModal();
+    try {
+      const authToken = localStorage.getItem('token');
+      await axios.post('https://aradax.com.et/quiz/questions', formData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setQuizData([...quizData, formData]);
+      setFormData({
+        questionText: '',
+        options: [],
+        correctAnswer: '',
+        catagory: '',
+      });
+      closeModal();
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+    }
   };
 
   const handleInputChange = (fieldName) => (event) => {
@@ -66,9 +83,15 @@ export default function QuizPage() {
     });
   };
 
-  const handleDeleteQuiz = (id) => {
-    // Handle quiz deletion logic here
-    setQuizData(quizData.filter((quiz) => quiz._id !== id));
+  const handleDeleteQuiz = async (id) => {
+    try {
+      const authToken = localStorage.getItem('token');
+      await axios.delete(`https://aradax.com.et/quiz/questions/${id}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+    }
   };
 
   return (
@@ -108,7 +131,7 @@ export default function QuizPage() {
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    value={formData.options.join(',')}
+                    value={formData.options}
                     onChange={handleInputChange('options')}
                   />
                   <TextField
@@ -124,10 +147,9 @@ export default function QuizPage() {
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    value={formData.category}
-                    onChange={handleInputChange('category')}
+                    value={formData.catagory}
+                    onChange={handleInputChange('catagory')}
                   />
-                  {/* You can add more fields as needed */}
                   <Button type="submit" variant="contained" color="primary" fullWidth>
                     Submit Quiz
                   </Button>
@@ -166,9 +188,9 @@ export default function QuizPage() {
                 {quizData.map((quiz) => (
                   <TableRow key={quiz._id}>
                     <TableCell>{quiz.questionText}</TableCell>
-                    <TableCell>{quiz.options.join(', ')}</TableCell>
+                    <TableCell>{quiz.options}</TableCell>
                     <TableCell>{quiz.correctAnswer}</TableCell>
-                    <TableCell>{quiz.category}</TableCell>
+                    <TableCell>{quiz.catagory}</TableCell>
                     <TableCell>
                       <IconButton onClick={() => handleDeleteQuiz(quiz._id)} color="secondary">
                         <DeleteIcon />

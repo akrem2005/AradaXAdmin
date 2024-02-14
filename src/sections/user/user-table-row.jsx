@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-
+import axios from 'axios';
 import Stack from '@mui/material/Stack';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
@@ -13,15 +13,17 @@ import IconButton from '@mui/material/IconButton';
 import Label from 'src/components/label';
 
 import Iconify from 'src/components/iconify';
+import { Key } from '@mui/icons-material';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({ selected, status, name, email, handleClick }) {
+export default function UserTableRow({ selected, status, name, id, deleted, email, handleClick }) {
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
+  const authToken = localStorage.getItem('token');
 
   const handleCloseMenu = () => {
     setOpen(null);
@@ -44,11 +46,39 @@ export default function UserTableRow({ selected, status, name, email, handleClic
         <TableCell>{email}</TableCell>
 
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={status ? 'error' : 'success'}>{status ? 'Banned' : 'Active'}</Label>
         </TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
+          </IconButton>
+        </TableCell>
+        <TableCell align="right">
+          <IconButton>
+            <Iconify
+              icon="eva:trash-2-outline"
+              onClick={() => {
+                handleCloseMenu();
+
+                // Your Axios request
+
+                const config = {
+                  method: 'get',
+                  maxBodyLength: Infinity,
+                  url: `https://aradax.com.et/users/delete/${id}`,
+                  headers: { Authorization: `Bearer ${authToken}` },
+                };
+
+                axios
+                  .request(config)
+                  .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }}
+            />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -63,15 +93,68 @@ export default function UserTableRow({ selected, status, name, email, handleClic
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+
+            // Your Axios request
+            const data = JSON.stringify({
+              activated: 'true',
+            });
+
+            const config = {
+              method: 'put',
+              maxBodyLength: Infinity,
+              url: `https://aradax.com.et/users/${id}`,
+              headers: { Authorization: `Bearer ${authToken}` },
+              data,
+            };
+
+            axios
+              .request(config)
+              .then((response) => {
+                console.log(JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }}
+        >
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Unbann User
+          Activate
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+
+            // Your Axios request
+            const data = JSON.stringify({
+              activated: 'false',
+            });
+
+            const config = {
+              method: 'put',
+              maxBodyLength: Infinity,
+              url: `https://aradax.com.et/users/${id}`,
+              headers: { Authorization: `Bearer ${authToken}` },
+              data,
+            };
+
+            axios
+              .request(config)
+              .then((response) => {
+                console.log(JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }}
+        >
+          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+          Deactiavte User
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Ban User
-        </MenuItem>
+        {/* ... Other MenuItems ... */}
       </Popover>
     </>
   );
@@ -80,7 +163,9 @@ export default function UserTableRow({ selected, status, name, email, handleClic
 UserTableRow.propTypes = {
   handleClick: PropTypes.func,
   name: PropTypes.any,
+  id: PropTypes.any,
   email: PropTypes.any,
   status: PropTypes.any,
+  deleted: PropTypes.any,
   selected: PropTypes.any,
 };

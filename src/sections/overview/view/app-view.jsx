@@ -1,16 +1,55 @@
-import { faker } from '@faker-js/faker';
-
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-
 import AppCurrentVisits from '../app-current-visits';
 import AppWebsiteVisits from '../app-website-visits';
 import AppWidgetSummary from '../app-widget-summary';
 
-// ----------------------------------------------------------------------
-
 export default function AppView() {
+  const [userData, setUserData] = useState({});
+  const [categoryData, setCategoryData] = useState({});
+  const [payData, setPayData] = useState({});
+  const [courseData, setCourseData] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const authToken = localStorage.getItem('token');
+
+      try {
+        if (authToken) {
+          const userResponse = await axios.get('https://aradax.com.et/users/getall', {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setUserData(userResponse.data);
+          console.log(userResponse.data);
+
+          const categoryResponse = await axios.get('https://aradax.com.et/categories/', {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setCategoryData(categoryResponse.data);
+          console.log(categoryResponse.data);
+
+          const payResponse = await axios.get('https://aradax.com.et/pay/', {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setPayData(payResponse.data);
+
+          const courseResponse = await axios.get('https://aradax.com.et/courses/', {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setCourseData(courseResponse.data);
+          console.log(courseResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -21,7 +60,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Total Users"
-            total={714000}
+            total={userData.length ?? 0}
             color="success"
             icon={<img alt="icon" src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" />}
           />
@@ -30,7 +69,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Total Courses"
-            total={1352831}
+            total={courseData.length ?? 0}
             color="info"
             icon={<img alt="icon" src="https://cdn-icons-png.flaticon.com/512/2436/2436874.png" />}
           />
@@ -39,7 +78,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Total Catagories"
-            total={1723315}
+            total={categoryData.length ?? 0}
             color="warning"
             icon={<img alt="icon" src="https://cdn-icons-png.flaticon.com/512/6724/6724239.png" />}
           />
@@ -47,16 +86,16 @@ export default function AppView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Total Feedbacks"
-            total={234}
+            title="Total Payments"
+            total={payData.length ?? 0}
             color="error"
-            icon={<img alt="icon" src="https://cdn-icons-png.flaticon.com/512/1484/1484584.png" />}
+            icon={<img alt="icon" src="https://cdn-icons-png.flaticon.com/512/726/726488.png" />}
           />
         </Grid>
-
+        <br />
         <Grid xs={12} md={6} lg={8}>
           <AppWebsiteVisits
-            title="Website Visits"
+            title="Users"
             subheader="(+43%) than last year"
             chart={{
               labels: [
@@ -91,20 +130,6 @@ export default function AppView() {
                   fill: 'solid',
                   data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
                 },
-              ],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AppCurrentVisits
-            title="Current Visits"
-            chart={{
-              series: [
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
               ],
             }}
           />

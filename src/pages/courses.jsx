@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Modal,
@@ -10,37 +10,39 @@ import {
   Card,
   CardContent,
   CardActions,
-  TableContainer,
-  Paper,
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
+
+const API_URL = 'https://aradax.com.et/courses/';
 
 export default function CoursePage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    _id: '65aa3e999a4dc8cdc526d128',
-    description: 'የኢ-ኮሜርስ ፍቺ ምን እንደሆነ ይወቁ። የኢ-ኮሜርስ ጥቅሞች ምን እንደሆኑ ያስሱ፣ አራት የተለያዩ የኤሌክትሮኒክ…',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/000/168/origi…',
-    __v: 0,
-    image: 'https://i.ytimg.com/vi/d2jUrFz1vGs/maxresdefault.jpg',
-    title: 'Introduction To Ecommerce',
-    category: 'ec',
+    description: '',
+    videoUrl: '',
+    image: '',
+    title: '',
+    category: '',
   });
+  const [courseData, setCourseData] = useState([]);
 
-  const [courseData, setcourseData] = useState([
-    // Add more course data entries as needed
-    {
-      _id: '65aa3e999a4dc8cdc526d128',
-      description: 'የኢ-ኮሜርስ ፍቺ ምን እንደሆነ ይወቁ። የኢ-ኮሜርስ ጥቅሞች ምን እንደሆኑ ያስሱ፣ አራት የተለያዩ የኤሌክትሮኒክ…',
-      videoUrl: 'https://static.videezy.com/system/resources/previews/000/000/168/origi…',
-      __v: 0,
-      image: 'https://i.ytimg.com/vi/d2jUrFz1vGs/maxresdefault.jpg',
-      title: 'Introduction To Ecommerce',
-      category: 'ec',
-    },
-    // Add more course data entries as needed
-  ]);
+  useEffect(() => {
+    const authToken = localStorage.getItem('token');
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(API_URL, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setCourseData(response.data);
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const openModal = () => {
     setModalOpen(true);
@@ -50,12 +52,25 @@ export default function CoursePage() {
     setModalOpen(false);
   };
 
-  const handlecourseSubmit = (event) => {
-    // Handle course submission logic here
+  const handleCourseSubmit = async (event) => {
+    const authToken = localStorage.getItem('token');
     event.preventDefault();
-    // Add your course submission logic, e.g., send data to the server
-    setcourseData([...courseData, formData]);
-    closeModal();
+    try {
+      await axios.post('https://aradax.com.et/courses/new', formData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setCourseData([...courseData, formData]);
+      setFormData({
+        description: '',
+        videoUrl: '',
+        image: '',
+        title: '',
+        category: '',
+      });
+      closeModal();
+    } catch (error) {
+      console.error('Error submitting course:', error);
+    }
   };
 
   const handleInputChange = (fieldName) => (event) => {
@@ -65,9 +80,16 @@ export default function CoursePage() {
     });
   };
 
-  const handleDeletecourse = (id) => {
-    // Handle course deletion logic here
-    setcourseData(courseData.filter((course) => course._id !== id));
+  const handleDeleteCourse = async (id) => {
+    const authToken = localStorage.getItem('token');
+    try {
+      await axios.get(`https://aradax.com.et/courses/delete/${id}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setCourseData(courseData.filter((course) => course._id !== id));
+    } catch (error) {
+      console.error('Error deleting course:', error);
+    }
   };
 
   return (
@@ -93,16 +115,7 @@ export default function CoursePage() {
                 <Typography variant="h5" align="center" gutterBottom>
                   Add course
                 </Typography>
-                <form onSubmit={handlecourseSubmit}>
-                  <TextField
-                    label="_id"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={formData._id}
-                    onChange={handleInputChange('_id')}
-                    disabled
-                  />
+                <form onSubmit={handleCourseSubmit}>
                   <TextField
                     label="Description"
                     variant="outlined"
@@ -163,35 +176,26 @@ export default function CoursePage() {
           </Grid>
         </Grid>
       </Modal>
+
       <br />
       <Typography variant="h5" gutterBottom>
         Course
       </Typography>
+
       <Grid container spacing={2}>
         {courseData.map((course) => (
           <Grid item key={course._id} xs={12} sm={6} md={4} lg={3}>
-            <Card
-              sx={{
-                borderRadius: 2,
-                overflow: 'hidden',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-                transition: 'transform 0.2s',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
-              }}
-            >
+            <Card>
+              {/* Display course data */}
               <CardMedia component="img" height="140" image={course.image} alt={course.title} />
-
               <CardContent>
                 <Typography variant="h6">{course.title}</Typography>
                 <Typography variant="body2" color="textSecondary">
                   {course.description}
                 </Typography>
               </CardContent>
-
               <CardActions>
-                <IconButton onClick={() => handleDeletecourse(course._id)} color="secondary">
+                <IconButton onClick={() => handleDeleteCourse(course._id)} color="secondary">
                   <DeleteIcon />
                 </IconButton>
               </CardActions>

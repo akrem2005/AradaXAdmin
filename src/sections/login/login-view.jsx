@@ -1,67 +1,77 @@
-import { useState } from 'react';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
+import React, { useState } from 'react';
+import { Box, Card, Stack, Typography, IconButton, InputAdornment, Snackbar } from '@mui/material';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 import { alpha, useTheme } from '@mui/material/styles';
-import InputAdornment from '@mui/material/InputAdornment';
-
+import MuiAlert from '@mui/material/Alert';
 import { useRouter } from 'src/routes/hooks';
-
-import { bgGradient } from 'src/theme/css';
-
+import axios from 'axios';
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
-import axios from 'axios'; // Import Axios
 
-// ----------------------------------------------------------------------
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function LoginView() {
   const theme = useTheme();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const handleClick = async () => {
-    try {
-      const response = await axios.post('https://aradax.com.et/users/login', {
-        email,
-        password,
-      });
-      console.log(JSON.stringify(response.data));
-      // Redirect to the dashboard or handle success
-      router.push('/dashboard');
-      // Show success alert
-      setSnackbarSeverity('success');
-      setSnackbarMessage('Login successful!');
-      setOpenSnackbar(true);
-    } catch (error) {
-      console.error(error);
-      // Handle error (display an error message or any other logic)
-      // Show error alert
-      setSnackbarSeverity('error');
-      setSnackbarMessage('Login failed. Please check your credentials and try again.');
-      setOpenSnackbar(true);
-    }
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
+  const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    setOpenSnackbar(false);
+    setSnackbarOpen(false);
+  };
+
+  const handleClick = async () => {
+    try {
+      setLoading(true);
+
+      const data = {
+        email,
+        password,
+      };
+
+      const response = await axios.post('https://aradax.com.et/users/login', data);
+
+      if (response.status === 200) {
+        const token = response.data.token;
+
+        if (token) {
+          localStorage.setItem('token', token);
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+          router.push('/dashboard');
+        } else {
+          console.error('Token not present in the response');
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
+        }
+      } else {
+        console.error('Unexpected response status:', response.status);
+
+        // Handle Bad Request (status code 400)
+        if (response.status === 400) {
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderForm = (
@@ -69,16 +79,17 @@ export default function LoginView() {
       <Stack spacing={3}>
         <TextField
           name="email"
-          label="Email address"
-          value={email}
           onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          label="Email address"
         />
+
         <TextField
           name="password"
           label="Password"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
           onChange={(e) => setPassword(e.target.value)}
+          value={password}
+          type={showPassword ? 'text' : 'password'}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -98,6 +109,7 @@ export default function LoginView() {
         variant="contained"
         color="inherit"
         onClick={handleClick}
+        loading={loading}
       >
         Login
       </LoadingButton>
@@ -107,37 +119,33 @@ export default function LoginView() {
   return (
     <Box
       sx={{
-        ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
-          imgUrl: '/assets/background/overlay_4.jpg',
-        }),
-        height: 1,
+        background: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/assets/background/overlay_4.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
-        <Card
-          sx={{
-            p: 5,
-            width: 1,
-            maxWidth: 420,
-          }}
-        >
-          <Typography variant="h4">Sign in to AradaX</Typography>
-          <br />
-          {renderForm}
-        </Card>
-        {/* Snackbar for success and error alerts */}
-        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-          <MuiAlert
-            elevation={6}
-            variant="filled"
-            severity={snackbarSeverity}
-            onClose={handleCloseSnackbar}
-          >
-            {snackbarMessage}
-          </MuiAlert>
-        </Snackbar>
-      </Stack>
+      <Card
+        sx={{
+          p: 5,
+          width: 1,
+          maxWidth: 420,
+        }}
+      >
+        <Typography variant="h4">Sign in to AradaX</Typography>
+        <br />
+        {renderForm}
+      </Card>
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarSeverity === 'success'
+            ? 'Login successful!'
+            : 'Login failed. Please check your credentials.'}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
