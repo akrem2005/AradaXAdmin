@@ -83,10 +83,10 @@ export default function QuizPage() {
     });
   };
 
-  const handleDeleteQuiz = async (id) => {
+  const handleDeleteQuiz = async (_id) => {
     try {
       const authToken = localStorage.getItem('token');
-      await axios.delete(`https://aradax.com.et/quiz/questions/${id}`, {
+      await axios.delete(`https://aradax.com.et/quiz/questions/${_id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
     } catch (error) {

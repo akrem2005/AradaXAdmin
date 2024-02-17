@@ -80,13 +80,13 @@ export default function CoursePage() {
     });
   };
 
-  const handleDeleteCourse = async (id) => {
+  const handleDeleteCourse = async (_id) => {
     const authToken = localStorage.getItem('token');
     try {
-      await axios.get(`https://aradax.com.et/courses/${id}`, {
+      await axios.get(`https://aradax.com.et/courses/${_id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      setCourseData(courseData.filter((course) => course._id !== id));
+      setCourseData(courseData.filter((course) => course._id !== _id));
     } catch (error) {
       console.error('Error deleting course:', error);
     }

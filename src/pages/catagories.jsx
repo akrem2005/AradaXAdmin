@@ -72,15 +72,15 @@ export default function CategoryPage() {
     });
   };
 
-  const handleDeleteCategory = async (id) => {
+  const handleDeleteCategory = async (_id) => {
     try {
-      await axios.delete(`https://aradax.com.et/categories/${id}`, {
+      await axios.delete(`https://aradax.com.et/categories/${_id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
 
-      setCategoryData((prevData) => prevData.filter((category) => category._id !== id));
+      setCategoryData((prevData) => prevData.filter((category) => category._id !== _id));
     } catch (error) {
       console.error('Error deleting category:', error);
     }
