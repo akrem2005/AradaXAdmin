@@ -83,7 +83,7 @@ export default function CoursePage() {
   const handleDeleteCourse = async (id) => {
     const authToken = localStorage.getItem('token');
     try {
-      await axios.get(`https://aradax.com.et/courses/delete/${id}`, {
+      await axios.get(`https://aradax.com.et/courses/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setCourseData(courseData.filter((course) => course._id !== id));

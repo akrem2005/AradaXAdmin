@@ -74,7 +74,7 @@ export default function CategoryPage() {
 
   const handleDeleteCategory = async (id) => {
     try {
-      await axios.delete(`https://aradax.com.et/categories/delete/${id}`, {
+      await axios.delete(`https://aradax.com.et/categories/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
