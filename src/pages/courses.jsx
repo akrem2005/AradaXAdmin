@@ -91,14 +91,25 @@ export default function CoursePage() {
     uploadData.append('htmlFile', formData2.htmlFile);
 
     try {
-      await axios.post('https://aradax.com.et/courses/upload', uploadData, {
+      const response = await axios.post('https://aradax.com.et/courses/upload', uploadData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
+
+      // Log the response for further inspection
+      console.log('File upload response:', response);
 
       // Handle success, for example, update your component state
       console.log('File uploaded successfully');
     } catch (error) {
-      console.error('Error uploading file:', error);
+      // Log the detailed error information
+      console.error('Error uploading file:', error.response);
+
+      // Handle specific errors if needed
+      if (error.response && error.response.status === 400) {
+        console.error('Bad Request - No file uploaded.');
+      } else {
+        console.error('Unexpected error:', error.message);
+      }
     }
   };
 
