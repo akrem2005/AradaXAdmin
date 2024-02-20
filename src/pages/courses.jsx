@@ -98,7 +98,7 @@ export default function CoursePage() {
       // Handle success, for example, update your component state
       console.log('File uploaded successfully');
     } catch (error) {
-      console.error('Error submitting course:', error);
+      console.error('Error uploading file:', error);
     }
   };
 
@@ -209,6 +209,7 @@ export default function CoursePage() {
         <input type="file" name="htmlFile" accept=".html" onChange={handleFileChange} />
         <button type="submit">Upload</button>
       </form>
+
       <br />
       <Typography variant="h5" gutterBottom>
         Course
