@@ -19,6 +19,9 @@ const API_URL = 'https://aradax.com.et/courses/';
 
 export default function CoursePage() {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [formData2, setFormData2] = useState({
+    htmlFile: null,
+  });
   const [formData, setFormData] = useState({
     description: '',
     videoUrl: '',
@@ -68,6 +71,32 @@ export default function CoursePage() {
         category: '',
       });
       closeModal();
+    } catch (error) {
+      console.error('Error submitting course:', error);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    setFormData2({
+      ...formData2,
+      htmlFile: event.target.files[0],
+    });
+  };
+
+  const handleUploadSubmit = async (event) => {
+    event.preventDefault();
+
+    const authToken = localStorage.getItem('token');
+    const uploadData = new FormData();
+    uploadData.append('htmlFile', formData2.htmlFile);
+
+    try {
+      await axios.post('https://aradax.com.et/courses/upload', uploadData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      // Handle success, for example, update your component state
+      console.log('File uploaded successfully');
     } catch (error) {
       console.error('Error submitting course:', error);
     }
@@ -176,7 +205,10 @@ export default function CoursePage() {
           </Grid>
         </Grid>
       </Modal>
-
+      <form onSubmit={handleUploadSubmit}>
+        <input type="file" name="htmlFile" accept=".html" onChange={handleFileChange} />
+        <button type="submit">Upload</button>
+      </form>
       <br />
       <Typography variant="h5" gutterBottom>
         Course
