@@ -193,6 +193,12 @@ export default function CoursePage() {
                 <Typography variant="body2" color="textSecondary">
                   {course.description}
                 </Typography>
+                <a href={course.videoUrl}>
+                  {' '}
+                  <Typography variant="body2" color="textSecondary">
+                    {course.videoUrl}
+                  </Typography>
+                </a>
               </CardContent>
               <CardActions>
                 <IconButton onClick={() => handleDeleteCourse(course._id)} color="secondary">
