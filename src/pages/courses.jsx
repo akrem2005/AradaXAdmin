@@ -88,12 +88,21 @@ export default function CoursePage() {
 
     const authToken = localStorage.getItem('token');
     const uploadData = new FormData();
-    uploadData.append('htmlFile', formData2.htmlFile);
+    uploadData.append('file', formData2.htmlFile);
+
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://aradax.com.et/courses/upload',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        ...uploadData.getHeaders(),
+      },
+      data: uploadData,
+    };
 
     try {
-      const response = await axios.post('https://aradax.com.et/courses/upload', uploadData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      const response = await axios.request(config);
 
       // Log the response for further inspection
       console.log('File upload response:', response);
