@@ -96,7 +96,7 @@ export default function CoursePage() {
       url: 'https://aradax.com.et/courses/upload',
       headers: {
         Authorization: `Bearer ${authToken}`,
-        ...uploadData.getHeaders(),
+        ...uploadData.getHeaders(), // Make sure to spread the headers correctly
       },
       data: uploadData,
     };
