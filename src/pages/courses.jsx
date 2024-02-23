@@ -76,11 +76,10 @@ export default function CoursePage() {
     }
   };
 
+  const [file, setFile] = useState(null);
+
   const handleFileChange = (event) => {
-    setFormData2({
-      ...formData2,
-      htmlFile: event.target.files[0],
-    });
+    setFile(event.target.files[0]);
   };
 
   const handleUploadSubmit = async (event) => {
@@ -88,7 +87,7 @@ export default function CoursePage() {
 
     const authToken = localStorage.getItem('token');
     const uploadData = new FormData();
-    uploadData.append('file', formData2.htmlFile);
+    uploadData.append('file', file);
 
     const config = {
       method: 'post',
